@@ -24,10 +24,8 @@ public class CreateUserController implements Controller {
         );
         log.debug("User : {}", user);
 
-//        UserDao userDao = new UserDao();
-//        userDao.insert(user);
-
-        DataBase.addUser(user);
+        UserDao userDao = new UserDao();
+        userDao.insert(user);
         return "redirect:/";
     }
 }
