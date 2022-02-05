@@ -1,5 +1,8 @@
 package next.dao;
 
+import core.jdbc.JdbcTemplate;
+import core.jdbc.PreparedStatementSetter;
+import core.jdbc.RowMapper;
 import java.sql.SQLException;
 import java.util.List;
 import next.model.User;
@@ -34,15 +37,17 @@ public class UserDao {
         updateJdbcTemplate.update(UPDATE_QUERY, pss);
     }
 
+    @SuppressWarnings("unchecked")
     public List<User> findAll() throws SQLException {
         JdbcTemplate selectJdbcTemplate = new JdbcTemplate();
+        PreparedStatementSetter pss = pstmt -> {};
         RowMapper rowMapper = rs -> new User(
             rs.getString("userId"),
             rs.getString("password"),
             rs.getString("name"),
             rs.getString("email")
         );
-        return (List<User>) selectJdbcTemplate.query(FIND_ALL_QUERY, rowMapper);
+        return (List<User>) selectJdbcTemplate.query(FIND_ALL_QUERY, pss, rowMapper);
     }
 
     public User findByUserId(String userId) throws SQLException {
