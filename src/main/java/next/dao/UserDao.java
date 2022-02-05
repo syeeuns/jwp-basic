@@ -1,9 +1,9 @@
 package next.dao;
 
+import core.jdbc.DataAccessException;
 import core.jdbc.JdbcTemplate;
 import core.jdbc.PreparedStatementSetter;
 import core.jdbc.RowMapper;
-import java.sql.SQLException;
 import java.util.List;
 import next.model.User;
 
@@ -15,7 +15,7 @@ public class UserDao {
     private static final String FIND_BY_ID_QUERY = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
 
 
-    public void insert(User user) throws SQLException {
+    public void insert(User user) throws DataAccessException {
         JdbcTemplate insertJdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {
             pstmt.setString(1, user.getUserId());
@@ -26,7 +26,7 @@ public class UserDao {
         insertJdbcTemplate.update(INSERT_QUERY, pss);
     }
 
-    public void update(User user) throws SQLException {
+    public void update(User user) throws DataAccessException {
         JdbcTemplate updateJdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {
             pstmt.setString(1, user.getPassword());
@@ -37,28 +37,27 @@ public class UserDao {
         updateJdbcTemplate.update(UPDATE_QUERY, pss);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<User> findAll() throws SQLException {
+    public List<User> findAll() throws DataAccessException {
         JdbcTemplate selectJdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {};
-        RowMapper rowMapper = rs -> new User(
+        RowMapper<User> rowMapper = rs -> new User(
             rs.getString("userId"),
             rs.getString("password"),
             rs.getString("name"),
             rs.getString("email")
         );
-        return (List<User>) selectJdbcTemplate.query(FIND_ALL_QUERY, pss, rowMapper);
+        return selectJdbcTemplate.query(FIND_ALL_QUERY, pss, rowMapper);
     }
 
-    public User findByUserId(String userId) throws SQLException {
+    public User findByUserId(String userId) throws DataAccessException {
         JdbcTemplate selectJdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> pstmt.setString(1, userId);
-        RowMapper rowMapper = rs -> new User(
+        RowMapper<User> rowMapper = rs -> new User(
             rs.getString("userId"),
             rs.getString("password"),
             rs.getString("name"),
             rs.getString("email")
         );
-        return (User) selectJdbcTemplate.queryForObject(FIND_BY_ID_QUERY, pss, rowMapper);
+        return selectJdbcTemplate.queryForObject(FIND_BY_ID_QUERY, pss, rowMapper);
     }
 }
